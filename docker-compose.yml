@@ -1,0 +1,46 @@
+version: '2'
+services:
+  mysql:
+    image: mysql/mysql-cluster:7.6.9-1.1.9-cluster
+    environment: 
+      MYSQL_ROOT_PASSWORD: 'password'
+    networks:
+      cluster:
+        ipv4_address: 192.168.0.10
+    depends_on: 
+      - ndb_mgmd
+      - ndb1
+      - ndb2
+  ndb_mgmd:
+    build: ./ndb_mgmd
+    environment: 
+      MYSQL_ROOT_PASSWORD: 'password'
+    networks:
+      cluster:
+        ipv4_address: 192.168.0.2
+  ndb1:
+    image: mysql/mysql-cluster:7.6.9-1.1.9-cluster
+    environment: 
+      MYSQL_ROOT_PASSWORD: 'password'
+    networks:
+      cluster:
+        ipv4_address: 192.168.0.3
+    depends_on: 
+      - ndb_mgmd
+  ndb2:
+    image: mysql/mysql-cluster:7.6.9-1.1.9-cluster
+    environment: 
+      MYSQL_ROOT_PASSWORD: 'password'
+    networks:
+      cluster:
+        ipv4_address: 192.168.0.4
+    depends_on: 
+      - ndb_mgmd
+networks:
+  cluster:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.0.0/8
+          gateway: 192.168.0.1
